@@ -26,4 +26,31 @@ end entity ArmDataReplication;
 architecture behave of ArmDataReplication is
 begin
 
+    process(DRP_INPUT, DRP_DMAS)
+    begin
+        case DRP_DMAS is
+
+            -- Wort unverändert weitergeben
+            when DMAS_WORD  =>
+                DRP_OUTPUT <= DRP_INPUT;
+
+            -- Niederwertiges Halbwort auf beide Halbworte replizieren
+            when DMAS_HWORD =>
+                DRP_OUTPUT <= DRP_INPUT(15 downto 0) &
+                              DRP_INPUT(15 downto 0);
+
+            -- Niederwertigstes Byte auf alle vier Bytes replizieren
+            when DMAS_BYTE =>
+                DRP_OUTPUT <= DRP_INPUT(7 downto 0) &
+                              DRP_INPUT(7 downto 0) &
+                              DRP_INPUT(7 downto 0) &
+                              DRP_INPUT(7 downto 0);
+
+            -- Sicherheitsfall
+            when others =>
+                DRP_OUTPUT <= DRP_INPUT;
+
+        end case;
+    end process;
+
 end architecture behave;
