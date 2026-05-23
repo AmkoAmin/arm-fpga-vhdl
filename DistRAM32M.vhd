@@ -24,6 +24,26 @@ entity DistRAM32M is
 end entity;
 
 architecture rtl of DistRAM32M is
+    type ram_type is array(0 to 31) of std_logic_vector(1 downto 0);
+    signal ram : ram_type;
+    attribute ram_style : string;
+    attribute ram_style of ram : signal is "distributed";
 begin
+
+    -- Synchroner Schreibzugriff ueber Port D, Write-Enable WED
+    process(WCLK)
+    begin
+        if rising_edge(WCLK) then
+            if WED = '1' then
+                ram(to_integer(unsigned(ADDRD))) <= DID;
+            end if;
+        end if;
+    end process;
+
+    -- Asynchrone Lesezugriffe an allen vier Ports
+    DOA <= ram(to_integer(unsigned(ADDRA)));
+    DOB <= ram(to_integer(unsigned(ADDRB)));
+    DOC <= ram(to_integer(unsigned(ADDRC)));
+    DOD <= ram(to_integer(unsigned(ADDRD)));
 
 end architecture;
