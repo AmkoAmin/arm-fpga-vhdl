@@ -38,8 +38,33 @@ end entity ArmMemInterface;
 
 architecture behave of ArmMemInterface is
 
+    component ArmRAMB_4kx32
+        generic (
+            SELECT_LINES : natural range 0 to 2 := 1
+        );
+        port (
+            RAM_CLK : in  std_logic;
+            ENA     : in  std_logic;
+            ADDRA   : in  std_logic_vector(11 downto 0);
+            WEB     : in  std_logic_vector(3 downto 0);
+            ENB     : in  std_logic;
+            ADDRB   : in  std_logic_vector(11 downto 0);
+            DIB     : in  std_logic_vector(31 downto 0);
+            DOA     : out std_logic_vector(31 downto 0);
+            DOB     : out std_logic_vector(31 downto 0)
+        );
+    end component;
+
+    signal s_ia_full     : std_logic_vector(31 downto 0);
+    signal s_DOA         : std_logic_vector(31 downto 0);
+    signal s_DOB         : std_logic_vector(31 downto 0);
+    signal s_web         : std_logic_vector(3 downto 0);
+    signal s_dabort_int  : std_logic;
+
 begin
-  s_ia_full <= IA(31 downto 2) & "00";
+
+    -- 30 Bit Instruktionsadresse zu 32 Bit Byteadresse ergaenzen
+    s_ia_full <= IA & "00";
 
     RAM_INST : ArmRAMB_4kx32
         generic map (
@@ -48,7 +73,7 @@ begin
         port map (
             RAM_CLK => RAM_CLK,
             ENA     => IDE,
-            ADDRA   => s_ia_full(13 downto 2),
+            ADDRA   => IA(13 downto 2),
             DOA     => s_DOA,
             ENB     => DDE,
             WEB     => s_web,
@@ -57,43 +82,41 @@ begin
             DOB     => s_DOB
         );
 
-    -- Misalignment detection
+    -- Misalignment-Erkennung (nur DA(1:0) entscheidet, plus reservierte
+    -- Codierung DMAS = "11"). Lesezugriffe werden ebenfalls als abort
+    -- gemeldet, sollen aber laut Aufgabenstellung dennoch ausgefuehrt
+    -- werden -> der eigentliche Speicherzugriff laeuft, nur das Schreiben
+    -- wird unten durch s_web = "0000" unterbunden.
     s_dabort_int <=
-        '1' when DMAS = "11"                                       else
-        '1' when DMAS = DMAS_TYPE_HALFWORD and DA(0) /= '0'       else
-        '1' when DMAS = DMAS_TYPE_WORD and DA(1 downto 0) /= "00" else
+        '1' when DMAS = DMAS_RESERVED                          else
+        '1' when DMAS = DMAS_WORD  and DA(1 downto 0) /= "00"  else
+        '1' when DMAS = DMAS_HWORD and DA(0) /= '0'            else
         '0';
 
-    -- Byte-lane write enable: only on aligned writes
+    -- WEB-Ableitung: nur bei aktivem Datenbus, Schreibzugriff und
+    -- ohne Misalignment werden tatsaechlich Bytes geschrieben.
     s_web <=
-        "0000" when (DDE = '0' or DnRW = '0' or s_dabort_int = '1') 
-        else
-        "1111" when DMAS = DMAS_TYPE_WORD                            
-        else
-        "1100" when DMAS = DMAS_TYPE_HALFWORD and DA(1) = '1'        
-        else
-        "0011" when DMAS = DMAS_TYPE_HALFWORD                        
-        else
-        "1000" when DMAS = DMAS_TYPE_BYTE and DA(1 downto 0) = "11"  
-        else
-        "0100" when DMAS = DMAS_TYPE_BYTE and DA(1 downto 0) = "10"  
-        else
-        "0010" when DMAS = DMAS_TYPE_BYTE and DA(1 downto 0) = "01"  
-        else
+        "0000" when (DDE = '0' or DnRW = '0' or s_dabort_int = '1') else
+        "1111" when DMAS = DMAS_WORD                                else
+        "1100" when DMAS = DMAS_HWORD and DA(1) = '1'               else
+        "0011" when DMAS = DMAS_HWORD                               else
+        "1000" when DMAS = DMAS_BYTE and DA(1 downto 0) = "11"      else
+        "0100" when DMAS = DMAS_BYTE and DA(1 downto 0) = "10"      else
+        "0010" when DMAS = DMAS_BYTE and DA(1 downto 0) = "01"      else
         "0001";
 
-    -- DABORT: high-Z for DDE=0
-    DABORT <= 'Z' when DDE = '0' else s_dabort_int;
+    -- Instruktionsbus-Ausgaenge: Tristate fuer IDE = 0
+    ID     <= (others => 'Z') when IDE = '0' else s_DOA;
 
-    -- ID: high-Z for IDE=0
-    ID <= (others => 'Z') when IDE = '0' else s_DOA;
-
-    -- IABORT: high-Z for IDE=0, address range check for IDE=1
     IABORT <= 'Z' when IDE = '0' else
               '1' when (unsigned(s_ia_full) < unsigned(INST_LOW_ADDR) or
                         unsigned(s_ia_full) > unsigned(INST_HIGH_ADDR)) else
               '0';
 
-    -- DDOUT: high-Z unless DDE=1 and read access
-    DDOUT <= (others => 'Z') when (DDE = '0' or DnRW = '1') else s_DOB;
+    -- Datenbus-Ausgaenge: Tristate fuer DDE = 0,
+    -- DDOUT zusaetzlich Tristate bei Schreibzugriffen (DnRW = 1).
+    DDOUT  <= (others => 'Z') when (DDE = '0' or DnRW = '1') else s_DOB;
+
+    DABORT <= 'Z' when DDE = '0' else s_dabort_int;
+
 end architecture behave;

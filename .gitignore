@@ -1,0 +1,29 @@
+# Vivado / XSim Simulationsartefakte
+sim_cli/
+xsim.dir/
+*.wdb
+*.pb
+*.jou
+*.log
+xsim_*.backup.*
+
+# GHDL Artefakte
+*.o
+*.cf
+work-obj*.cf
+
+# Kompilierte Testbench-Binaries
+armregaddresstranslation_tb
+e~*.o
+
+# Vivado Projekt-Caches (falls jemand lokal anlegt)
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+
+# OS / Editor
+.DS_Store
+*.swp
+*~
