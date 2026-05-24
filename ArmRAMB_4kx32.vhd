@@ -27,11 +27,44 @@ entity ArmRAMB_4kx32 is
         DOB     : out std_logic_vector(31 downto 0)
     );
 end entity ArmRAMB_4kx32;
-
+    
+        
 architecture behavioral of ArmRAMB_4kx32 is
 
+    type ram_type is array (0 to 4095) of std_logic_vector(31 downto 0);
+    signal RAM : ram_type;
 begin
+    -- Port A: reiner Lesezugriff
+    process(RAM_CLK)
+    begin
+        if rising_edge(RAM_CLK) then
+            if ENA = '1' then
+                -- Lese den aktuellen Speicherwert an der angelegten Adresse aus
+                DOA <= RAM(to_integer(unsigned(ADDRA)));
+            end if;
+            -- Wenn ENA = '0', bleibt DOA unverändert (hält letzten Wert)
+        end if;
+    end process;
 
-
-
-end architecture behavioral;
+    -- Port B: Lese-/Schreibzugriff, Read-First, byteweises Write-Enable
+    process(RAM_CLK)
+        variable addr_int : integer;
+        variable word : std_logic_vector(31 downto 0);  -- Zwischenspeicher für Read-First
+    begin
+        if rising_edge(RAM_CLK) then
+            if ENB = '1' then
+                addr_int := to_integer(unsigned(ADDRB));
+                word := RAM(addr_int);          -- alten Wert lesen
+                DOB <= word;                    -- Read-First: alter Wert erscheint
+                -- Bytes gemäß WEB überschreiben
+                for i in 0 to 3 loop
+                    if WEB(i) = '1' then
+                        word(i*8+7 downto i*8) := DIB(i*8+7 downto i*8);
+                    end if;
+                end loop;
+                RAM(addr_int) <= word;          -- neuen Wert schreiben
+            end if;
+        end if;
+    end process;
+    
+end behavioral;
