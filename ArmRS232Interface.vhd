@@ -4,6 +4,7 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 library work;
 use work.ArmTypes.all;
@@ -384,8 +385,130 @@ begin
     -------------------------------------------------------------------------------
     -- Hinweis: RS232_TRM_REG ist 8 Bit gross
     RS232_TRANSMITTER : block is
-        -- Platz für Typen, Signale und Konstanten, die Sie exklusiv für den RS232-Sender benötigen.
+        --------------------------------------------------------------------------------
+        -- 4-Zustands-FSM (Moore-Typ):
+        --   TX_IDLE  : Leitung ruht auf '1', wartet auf START_TRANSMISSION.
+        --   TX_START : Startbit ('0') wird fuer RS232_DELAY Takte gesendet.
+        --   TX_DATA  : Acht Nutzdatenbits, LSB zuerst, je RS232_DELAY Takte.
+        --   TX_STOP  : Stoppbit ('1') wird fuer RS232_DELAY Takte gesendet.
+        --------------------------------------------------------------------------------
+        type TX_STATE_TYPE is (TX_IDLE, TX_START, TX_DATA, TX_STOP);
+        signal tx_state,    tx_next_state    : TX_STATE_TYPE                 := TX_IDLE;
+
+        -- Lokale Kopie des Sendedatums; ueber data_reg(0) wird das aktuelle
+        -- Bit auf TXD ausgegeben und mit jedem Bitwechsel nach rechts geschoben.
+        signal data_reg,    data_next        : std_logic_vector(7 downto 0)  := (others => '0');
+
+        -- Zaehlt die bereits gesendeten Nutzdatenbits (0..7).
+        signal bit_count,   bit_count_next   : integer range 0 to 7          := 0;
+
+        -- Zaehlt die Takte innerhalb eines Bits. Erreicht der Zaehler
+        -- RS232_DELAY-1, ist das aktuelle Bit fertig.
+        signal delay_count, delay_count_next : unsigned(31 downto 0)         := (others => '0');
+
+        -- Registrierte Ausgaenge: aendern sich ausschliesslich an Taktflanken.
+        signal txd_reg,     txd_next         : std_logic                     := '1';
+        signal busy_reg,    busy_next        : std_logic                     := '0';
     begin
-        -- Ihre Beschreibung des RS232-Senders.
+        --------------------------------------------------------------------------------
+        -- Ausgaenge des Blocks. TRANSMITTER_BUSY wird zusaetzlich mit
+        -- START_TRANSMISSION verodert, damit das Signal bereits in dem Taktzyklus
+        -- '1' ist, in dem START_TRANSMISSION auftritt (Forderung der Aufgabe).
+        -- Beide Quellen sind selbst registrierte Signale, die FSM-Ausgaenge
+        -- bleiben damit taktsynchron.
+        --------------------------------------------------------------------------------
+        RS232_TXD        <= txd_reg;
+        TRANSMITTER_BUSY <= busy_reg or START_TRANSMISSION;
+
+        --------------------------------------------------------------------------------
+        -- Zustands- und Datapath-Register.
+        --------------------------------------------------------------------------------
+        TX_REG_PROC : process(SYS_CLK) is
+        begin
+            if rising_edge(SYS_CLK) then
+                if SYS_RST = '1' then
+                    tx_state    <= TX_IDLE;
+                    data_reg    <= (others => '0');
+                    bit_count   <= 0;
+                    delay_count <= (others => '0');
+                    txd_reg     <= '1';
+                    busy_reg    <= '0';
+                else
+                    tx_state    <= tx_next_state;
+                    data_reg    <= data_next;
+                    bit_count   <= bit_count_next;
+                    delay_count <= delay_count_next;
+                    txd_reg     <= txd_next;
+                    busy_reg    <= busy_next;
+                end if;
+            end if;
+        end process TX_REG_PROC;
+
+        --------------------------------------------------------------------------------
+        -- Kombinatorische FSM: ermittelt Folgezustand sowie die neuen Werte der
+        -- registrierten Ausgaenge und Zaehler.
+        --------------------------------------------------------------------------------
+        TX_COMB_PROC : process(tx_state, data_reg, bit_count, delay_count,
+                               txd_reg, busy_reg, START_TRANSMISSION,
+                               RS232_TRM_REG) is
+        begin
+            -- Default: alle Register behalten ihren Wert, Zaehler laeuft weiter.
+            tx_next_state    <= tx_state;
+            data_next        <= data_reg;
+            bit_count_next   <= bit_count;
+            delay_count_next <= delay_count + 1;
+            txd_next         <= txd_reg;
+            busy_next        <= busy_reg;
+
+            case tx_state is
+                when TX_IDLE =>
+                    busy_next        <= '0';
+                    txd_next         <= '1';
+                    delay_count_next <= (others => '0');
+                    bit_count_next   <= 0;
+                    if START_TRANSMISSION = '1' then
+                        -- Nutzdaten uebernehmen, Startbit auf die Leitung legen.
+                        data_next        <= RS232_TRM_REG;
+                        busy_next        <= '1';
+                        txd_next         <= '0';
+                        tx_next_state    <= TX_START;
+                        delay_count_next <= (others => '0');
+                    end if;
+
+                when TX_START =>
+                    if delay_count = RS232_DELAY - 1 then
+                        -- Startbit fertig, erstes Nutzbit (LSB) ausgeben.
+                        delay_count_next <= (others => '0');
+                        txd_next         <= data_reg(0);
+                        bit_count_next   <= 0;
+                        tx_next_state    <= TX_DATA;
+                    end if;
+
+                when TX_DATA =>
+                    if delay_count = RS232_DELAY - 1 then
+                        delay_count_next <= (others => '0');
+                        if bit_count = 7 then
+                            -- Alle acht Nutzbits gesendet, Stoppbit anlegen.
+                            txd_next       <= '1';
+                            bit_count_next <= 0;
+                            tx_next_state  <= TX_STOP;
+                        else
+                            -- Naechstes Nutzbit auf die Leitung schieben.
+                            bit_count_next <= bit_count + 1;
+                            data_next      <= '0' & data_reg(7 downto 1);
+                            txd_next       <= data_reg(1);
+                        end if;
+                    end if;
+
+                when TX_STOP =>
+                    if delay_count = RS232_DELAY - 1 then
+                        -- Stoppbit fertig, zurueck in den Leerlauf.
+                        delay_count_next <= (others => '0');
+                        txd_next         <= '1';
+                        busy_next        <= '0';
+                        tx_next_state    <= TX_IDLE;
+                    end if;
+            end case;
+        end process TX_COMB_PROC;
     end block RS232_TRANSMITTER;
 end architecture behave;
