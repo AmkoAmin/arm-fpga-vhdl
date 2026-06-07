@@ -44,7 +44,6 @@ begin
             end if;
         end if;
     end process;
-
     -- Port B: synchroner Lese-/Schreibzugriff mit byteweisem Write-Enable.
     -- Read-First: der Lesezugriff liefert den unveraenderten Wert; das
     -- ergibt sich durch Signal-Semantik (alle Zuweisungen wirken erst
@@ -63,5 +62,4 @@ begin
             end if;
         end if;
     end process;
-
 end architecture behavioral;

@@ -1,0 +1,626 @@
+#-----------------------------------------------------------
+# Vivado v2017.3 (64-bit)
+# SW Build 2018833 on Wed Oct  4 19:58:07 MDT 2017
+# IP Build 2016188 on Wed Oct  4 21:52:56 MDT 2017
+# Start of session at: Sun Jun  7 19:46:46 2026
+# Process ID: 9210
+# Current directory: /home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1
+# Command line: vivado -log ArmUncoreTop.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source ArmUncoreTop.tcl
+# Log file: /home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/ArmUncoreTop.vds
+# Journal file: /home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/vivado.jou
+#-----------------------------------------------------------
+source ArmUncoreTop.tcl -notrace
+Command: synth_design -top ArmUncoreTop -part xc7a35tcpg236-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a35t'
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 9224 
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:05 . Memory (MB): peak = 1218.562 ; gain = 69.000 ; free physical = 8829 ; free virtual = 17113
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'ArmUncoreTop' [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:36]
+INFO: [Synth 8-3491] module 'ArmSwitchDebounce' declared at '/home/aminskenderi/hwpti/HWPTI/ArmSwitchDebounce.vhd:16' bound to instance 'Debouncing_EXT_LDP' of component 'ArmSwitchDebounce' [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:175]
+INFO: [Synth 8-638] synthesizing module 'ArmSwitchDebounce' [/home/aminskenderi/hwpti/HWPTI/ArmSwitchDebounce.vhd:25]
+INFO: [Synth 8-638] synthesizing module 'ArmWaitStateGenAsync' [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:24]
+	Parameter COUNT_VALUE_WIDTH bound to: 16 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'ArmWaitStateGenAsync' (1#1) [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:24]
+INFO: [Synth 8-256] done synthesizing module 'ArmSwitchDebounce' (2#1) [/home/aminskenderi/hwpti/HWPTI/ArmSwitchDebounce.vhd:25]
+INFO: [Synth 8-3491] module 'ArmChipSelectGenerator' declared at '/home/aminskenderi/hwpti/HWPTI/ArmChipSelectGenerator.vhd:27' bound to instance 'Inst_ArmChipSelectGenerator' of component 'ArmChipSelectGenerator' [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:183]
+INFO: [Synth 8-638] synthesizing module 'ArmChipSelectGenerator' [/home/aminskenderi/hwpti/HWPTI/ArmChipSelectGenerator.vhd:43]
+INFO: [Synth 8-256] done synthesizing module 'ArmChipSelectGenerator' (3#1) [/home/aminskenderi/hwpti/HWPTI/ArmChipSelectGenerator.vhd:43]
+	Parameter SELECT_LINES bound to: 1 - type: integer 
+INFO: [Synth 8-3491] module 'ArmMemInterface' declared at '/home/aminskenderi/hwpti/HWPTI/ArmMemInterface.vhd:12' bound to instance 'Inst_ArmMemInterface' of component 'ArmMemInterface' [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:192]
+INFO: [Synth 8-638] synthesizing module 'ArmMemInterface' [/home/aminskenderi/hwpti/HWPTI/ArmMemInterface.vhd:39]
+	Parameter SELECT_LINES bound to: 1 - type: integer 
+	Parameter EXTERNAL_ADDRESS_DECODING_INSTRUCTION bound to: 0 - type: bool 
+	Parameter SELECT_LINES bound to: 1 - type: integer 
+INFO: [Synth 8-3491] module 'ArmRAMB_4kx32' declared at '/home/aminskenderi/hwpti/HWPTI/ArmRAMB_4kx32.vhd:9' bound to instance 'RAM_INST' of component 'ArmRAMB_4kx32' [/home/aminskenderi/hwpti/HWPTI/ArmMemInterface.vhd:69]
+INFO: [Synth 8-638] synthesizing module 'ArmRAMB_4kx32' [/home/aminskenderi/hwpti/HWPTI/ArmRAMB_4kx32.vhd:31]
+	Parameter SELECT_LINES bound to: 1 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'ArmRAMB_4kx32' (4#1) [/home/aminskenderi/hwpti/HWPTI/ArmRAMB_4kx32.vhd:31]
+INFO: [Synth 8-256] done synthesizing module 'ArmMemInterface' (5#1) [/home/aminskenderi/hwpti/HWPTI/ArmMemInterface.vhd:39]
+INFO: [Synth 8-3491] module 'ArmRS232Interface' declared at '/home/aminskenderi/hwpti/HWPTI/ArmRS232Interface.vhd:44' bound to instance 'Inst_ArmRS232Interface' of component 'ArmRS232Interface' [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:211]
+INFO: [Synth 8-638] synthesizing module 'ArmRS232Interface' [/home/aminskenderi/hwpti/HWPTI/ArmRS232Interface.vhd:63]
+INFO: [Synth 8-638] synthesizing module 'ArmWaitStateGenAsync__parameterized0' [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:24]
+	Parameter COUNT_VALUE_WIDTH bound to: 32 - type: integer 
+INFO: [Synth 8-256] done synthesizing module 'ArmWaitStateGenAsync__parameterized0' (5#1) [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:24]
+INFO: [Synth 8-256] done synthesizing module 'ArmRS232Interface' (6#1) [/home/aminskenderi/hwpti/HWPTI/ArmRS232Interface.vhd:63]
+INFO: [Synth 8-3491] module 'ArmSystemController' declared at '/home/aminskenderi/hwpti/HWPTI/ArmSystemController.vhd:41' bound to instance 'Inst_ArmSystemController' of component 'ArmSystemController' [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:227]
+INFO: [Synth 8-638] synthesizing module 'ArmSystemController' [/home/aminskenderi/hwpti/HWPTI/ArmSystemController.vhd:64]
+INFO: [Synth 8-3491] module 'ArmClkGen' declared at '/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/.Xil/Vivado-9210-aminskenderi-IdeaPad-5-Pro-14ITL6/realtime/ArmClkGen_stub.vhdl:5' bound to instance 'Inst_ArmClkGen' of component 'ArmClkGen' [/home/aminskenderi/hwpti/HWPTI/ArmSystemController.vhd:114]
+INFO: [Synth 8-638] synthesizing module 'ArmClkGen' [/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/.Xil/Vivado-9210-aminskenderi-IdeaPad-5-Pro-14ITL6/realtime/ArmClkGen_stub.vhdl:16]
+INFO: [Synth 8-256] done synthesizing module 'ArmSystemController' (7#1) [/home/aminskenderi/hwpti/HWPTI/ArmSystemController.vhd:64]
+INFO: [Synth 8-256] done synthesizing module 'ArmUncoreTop' (8#1) [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.vhd:36]
+WARNING: [Synth 8-3331] design ArmSystemController has unconnected port CTRL_DABORT
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[31]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[30]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[29]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[28]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[27]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[26]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[25]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[24]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[23]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[22]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[21]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[20]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[19]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[18]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[17]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[16]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[15]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[14]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[13]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[12]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[11]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[10]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[9]
+WARNING: [Synth 8-3331] design ArmRS232Interface has unconnected port RS232_DDIN[8]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[31]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[30]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[29]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[28]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[27]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[26]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[25]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[24]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[23]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[22]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[21]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[20]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[19]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[18]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[17]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[16]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[15]
+WARNING: [Synth 8-3331] design ArmMemInterface has unconnected port DA[14]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[11]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[10]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[9]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[8]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[7]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[6]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[5]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[4]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[3]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[2]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[1]
+WARNING: [Synth 8-3331] design ArmChipSelectGenerator has unconnected port CSG_DA[0]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:05 ; elapsed = 00:00:06 . Memory (MB): peak = 1262.094 ; gain = 112.531 ; free physical = 8786 ; free virtual = 17070
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:06 ; elapsed = 00:00:06 . Memory (MB): peak = 1262.094 ; gain = 112.531 ; free physical = 8784 ; free virtual = 17069
+---------------------------------------------------------------------------------
+INFO: [Device 21-403] Loading part xc7a35tcpg236-1
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/.Xil/Vivado-9210-aminskenderi-IdeaPad-5-Pro-14ITL6/dcp3/ArmClkGen_in_context.xdc] for cell 'Inst_ArmSystemController/Inst_ArmClkGen'
+Finished Parsing XDC File [/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/.Xil/Vivado-9210-aminskenderi-IdeaPad-5-Pro-14ITL6/dcp3/ArmClkGen_in_context.xdc] for cell 'Inst_ArmSystemController/Inst_ArmClkGen'
+Parsing XDC File [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.xdc]
+Finished Parsing XDC File [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.xdc]
+INFO: [Project 1-236] Implementation specific constraints were found while reading constraint file [/home/aminskenderi/hwpti/HWPTI/ArmUncoreTop.xdc]. These constraints will be ignored for synthesis but will be used in implementation. Impacted constraints are listed in the file [.Xil/ArmUncoreTop_propImpl.xdc].
+Resolution: To avoid this warning, move constraints listed in [.Xil/ArmUncoreTop_propImpl.xdc] to another XDC file and exclude this new file from synthesis with the used_in_synthesis property (File Properties dialog in GUI) and re-run elaboration/synthesis.
+Parsing XDC File [/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/dont_touch.xdc]
+Finished Parsing XDC File [/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/dont_touch.xdc]
+Completed Processing XDC Constraints
+
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00 . Memory (MB): peak = 1657.906 ; gain = 0.000 ; free physical = 8586 ; free virtual = 16872
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:15 ; elapsed = 00:00:21 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8669 ; free virtual = 16955
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a35tcpg236-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:15 ; elapsed = 00:00:21 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8669 ; free virtual = 16955
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+Applied set_property IO_BUFFER_TYPE = NONE for EXT_CLK. (constraint file  /home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/.Xil/Vivado-9210-aminskenderi-IdeaPad-5-Pro-14ITL6/dcp3/ArmClkGen_in_context.xdc, line 4).
+Applied set_property CLOCK_BUFFER_TYPE = NONE for EXT_CLK. (constraint file  /home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/.Xil/Vivado-9210-aminskenderi-IdeaPad-5-Pro-14ITL6/dcp3/ArmClkGen_in_context.xdc, line 5).
+Applied set_property DONT_TOUCH = true for Inst_ArmSystemController/Inst_ArmClkGen. (constraint file  auto generated constraint, line ).
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:15 ; elapsed = 00:00:21 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8671 ; free virtual = 16956
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:47]
+INFO: [Synth 8-5546] ROM "COUNT_REG" won't be mapped to RAM because it is too sparse
+WARNING: [Synth 8-6014] Unused sequential element COUNT_REG_reg was removed.  [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:45]
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:47]
+INFO: [Synth 8-5545] ROM "COUNT_REG" won't be mapped to RAM because address size (32) is larger than maximum supported(25)
+WARNING: [Synth 8-6014] Unused sequential element COUNT_REG_reg was removed.  [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:45]
+INFO: [Synth 8-5545] ROM "tx_next_state" won't be mapped to RAM because address size (32) is larger than maximum supported(25)
+INFO: [Synth 8-5544] ROM "tx_next_state" won't be mapped to Block RAM because address size (3) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "data_next" won't be mapped to Block RAM because address size (3) smaller than threshold (5)
+INFO: [Synth 8-5545] ROM "delay_count_next" won't be mapped to RAM because address size (32) is larger than maximum supported(25)
+INFO: [Synth 8-5545] ROM "delay_count_next" won't be mapped to RAM because address size (32) is larger than maximum supported(25)
+INFO: [Synth 8-5545] ROM "delay_count_next" won't be mapped to RAM because address size (32) is larger than maximum supported(25)
+INFO: [Synth 8-5818] HDL ADVISOR - The operator resource <adder> is shared. To prevent sharing consider applying a KEEP on the output of the operator [/home/aminskenderi/hwpti/HWPTI/ArmSystemController.vhd:198]
+INFO: [Synth 8-802] inferred FSM for state register 'CTRL_STATE_reg' in module 'ArmSystemController'
+INFO: [Synth 8-5544] ROM "CTRL_WORKING" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CTRL_STATE" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CTRL_STATE" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CTRL_STATE" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CTRL_STATE" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CTRL_STATE" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+               ctrl_idle |                             0000 |                             0000
+  ctrl_read_stdin_status |                             0001 |                             0001
+    ctrl_read_stdin_data |                             0010 |                             0010
+          ctrl_write_mem |                             0011 |                             0110
+           ctrl_read_mem |                             0100 |                             0101
+ ctrl_read_stdout_status |                             0101 |                             0011
+  ctrl_write_stdout_data |                             0110 |                             0100
+         ctrl_wait_state |                             0111 |                             1000
+           ctrl_finished |                             1000 |                             0111
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'CTRL_STATE_reg' using encoding 'sequential' in module 'ArmSystemController'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:15 ; elapsed = 00:00:21 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8655 ; free virtual = 16941
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     32 Bit       Adders := 1     
+	   2 Input     16 Bit       Adders := 1     
+	   2 Input     14 Bit       Adders := 1     
+	   2 Input      3 Bit       Adders := 1     
++---XORs : 
+	   2 Input      1 Bit         XORs := 20    
++---Registers : 
+	               32 Bit    Registers := 7     
+	               16 Bit    Registers := 1     
+	                8 Bit    Registers := 7     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 2     
+	                1 Bit    Registers := 12    
++---RAMs : 
+	             128K Bit         RAMs := 1     
++---Muxes : 
+	   2 Input     32 Bit        Muxes := 10    
+	   4 Input     32 Bit        Muxes := 1     
+	   9 Input     32 Bit        Muxes := 2     
+	   9 Input     16 Bit        Muxes := 1     
+	   4 Input      9 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 4     
+	   4 Input      8 Bit        Muxes := 4     
+	   9 Input      8 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 5     
+	  15 Input      4 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 2     
+	   4 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 4     
+	   4 Input      2 Bit        Muxes := 2     
+	   9 Input      2 Bit        Muxes := 1     
+	   3 Input      1 Bit        Muxes := 2     
+	   2 Input      1 Bit        Muxes := 17    
+	   4 Input      1 Bit        Muxes := 9     
+	   6 Input      1 Bit        Muxes := 1     
+	   9 Input      1 Bit        Muxes := 9     
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Hierarchical Component Statistics 
+---------------------------------------------------------------------------------
+Hierarchical RTL Component report 
+Module ArmUncoreTop 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input     32 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 2     
+Module ArmWaitStateGenAsync 
+Detailed RTL Component Info : 
++---Muxes : 
+	   3 Input      1 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+Module ArmSwitchDebounce 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 2     
+Module ArmChipSelectGenerator 
+Detailed RTL Component Info : 
++---XORs : 
+	   2 Input      1 Bit         XORs := 20    
+Module ArmRAMB_4kx32 
+Detailed RTL Component Info : 
++---Registers : 
+	               32 Bit    Registers := 2     
++---RAMs : 
+	             128K Bit         RAMs := 1     
++---Muxes : 
+	   2 Input     32 Bit        Muxes := 6     
+	   2 Input      8 Bit        Muxes := 1     
+Module ArmMemInterface 
+Detailed RTL Component Info : 
++---Muxes : 
+	   2 Input     32 Bit        Muxes := 1     
+	   2 Input      4 Bit        Muxes := 5     
+	   2 Input      3 Bit        Muxes := 1     
+	   2 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 2     
+Module ArmWaitStateGenAsync__parameterized0 
+Detailed RTL Component Info : 
++---Muxes : 
+	   3 Input      1 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 1     
+Module ArmRS232Interface 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     32 Bit       Adders := 1     
+	   2 Input      3 Bit       Adders := 1     
++---Registers : 
+	               32 Bit    Registers := 2     
+	                8 Bit    Registers := 6     
+	                3 Bit    Registers := 1     
+	                2 Bit    Registers := 2     
+	                1 Bit    Registers := 7     
++---Muxes : 
+	   4 Input     32 Bit        Muxes := 1     
+	   2 Input     32 Bit        Muxes := 1     
+	   4 Input      9 Bit        Muxes := 1     
+	   4 Input      8 Bit        Muxes := 3     
+	   2 Input      8 Bit        Muxes := 2     
+	   4 Input      3 Bit        Muxes := 1     
+	   2 Input      3 Bit        Muxes := 1     
+	   4 Input      2 Bit        Muxes := 2     
+	   2 Input      2 Bit        Muxes := 3     
+	   4 Input      1 Bit        Muxes := 9     
+	   2 Input      1 Bit        Muxes := 7     
+	   6 Input      1 Bit        Muxes := 1     
+Module ArmSystemController 
+Detailed RTL Component Info : 
++---Adders : 
+	   2 Input     16 Bit       Adders := 1     
+	   2 Input     14 Bit       Adders := 1     
++---Registers : 
+	               32 Bit    Registers := 3     
+	               16 Bit    Registers := 1     
+	                8 Bit    Registers := 1     
+	                1 Bit    Registers := 3     
++---Muxes : 
+	   2 Input     32 Bit        Muxes := 1     
+	   9 Input     32 Bit        Muxes := 2     
+	   9 Input     16 Bit        Muxes := 1     
+	   4 Input      8 Bit        Muxes := 1     
+	   9 Input      8 Bit        Muxes := 1     
+	   2 Input      8 Bit        Muxes := 1     
+	  15 Input      4 Bit        Muxes := 1     
+	   9 Input      2 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 4     
+	   9 Input      1 Bit        Muxes := 9     
+---------------------------------------------------------------------------------
+Finished RTL Hierarchical Component Statistics
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 90 (col length:60)
+BRAMs: 100 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-6014] Unused sequential element Debouncing_EXT_LDP/SAMPLE_CLK_GEN/COUNT_REG_reg was removed.  [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:45]
+WARNING: [Synth 8-6014] Unused sequential element Inst_ArmRS232Interface/RS232_RECEIVER.WSG/COUNT_REG_reg was removed.  [/home/aminskenderi/hwpti/HWPTI/ArmWaitStateGenAsync.vhd:45]
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[30]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[31]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[29]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[28]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[27]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[26]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[25]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[24]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[23]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[22]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[21]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[20]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[19]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[18]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[17]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[16]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[15]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[14]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[13]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[12]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[11]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[10]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[9]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[7]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[0]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[6]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[5]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[0]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[4]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[3]' (FDR) to 'Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[0]'
+INFO: [Synth 8-3333] propagating constant 1 across sequential element (\Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[2] )
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1] )
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][1]' (FD) to 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][2]' (FD) to 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][3]' (FD) to 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][5]' (FD) to 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][6]' (FD) to 'Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7]'
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7] )
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[8]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[9]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[17]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[10]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[18]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[11]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[19]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[12]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[20]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[13]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[21]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[14]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[22]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[15]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[23]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[16]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[24]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[17]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[25]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[18]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[26]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[19]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[27]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[20]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[28]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[21]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[29]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[22]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[30]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_REG_reg[23]' (FDRE) to 'Inst_ArmSystemController/DATA_REG_reg[31]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[29]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[30]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[27]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[26]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[25]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[24]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[23]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[22]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[21]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[20]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[19]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[18]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[17]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]'
+INFO: [Synth 8-3886] merging instance 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[16]' (FDRE) to 'Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[28]'
+INFO: [Synth 8-3333] propagating constant 0 across sequential element (\Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[28] )
+WARNING: [Synth 8-3332] Sequential element (Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[2]) is unused and will be removed from module ArmUncoreTop.
+WARNING: [Synth 8-3332] Sequential element (Inst_ArmRS232Interface/RS232_RECEIVER.WSG_DELAY_REG_reg[1]) is unused and will be removed from module ArmUncoreTop.
+WARNING: [Synth 8-3332] Sequential element (Inst_ArmRS232Interface/INTERFACE_COMMUNICATION.REGISTER_SET_reg[2][7]) is unused and will be removed from module ArmUncoreTop.
+WARNING: [Synth 8-3332] Sequential element (Inst_ArmSystemController/DATA_ADDRESS_VECTOR_reg[28]) is unused and will be removed from module ArmUncoreTop.
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:16 ; elapsed = 00:00:22 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8630 ; free virtual = 16917
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Preliminary Mapping  Report (see note below)
++---------------+------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name    | RTL Object | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++---------------+------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|ArmRAMB_4kx32: | ram_reg    | 4 K x 32(READ_FIRST)   | W | R | 4 K x 32(WRITE_FIRST)  |   | R | Port A and B     | 0      | 4      | 
++---------------+------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The tale above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+INFO: [Synth 8-5578] Moved timing constraint from pin 'Inst_ArmSystemController/Inst_ArmClkGen/clk_out1' to pin 'Inst_ArmSystemController/Inst_ArmClkGen/bbstub_clk_out1/O'
+INFO: [Synth 8-5578] Moved timing constraint from pin 'Inst_ArmSystemController/Inst_ArmClkGen/clk_out2' to pin 'Inst_ArmSystemController/Inst_ArmClkGen/bbstub_clk_out2/O'
+INFO: [Synth 8-5819] Moved 2 constraints on hierarchical pins to their respective driving/loading pins
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:00:20 ; elapsed = 00:00:27 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8318 ; free virtual = 16617
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:20 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8270 ; free virtual = 16570
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping  Report
++-------------+---------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name  | RTL Object                            | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++-------------+---------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|ArmUncoreTop | Inst_ArmMemInterface/RAM_INST/ram_reg | 4 K x 32(READ_FIRST)   | W | R | 4 K x 32(WRITE_FIRST)  |   | R | Port A and B     | 0      | 4      | 
++-------------+---------------------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-4480] The timing for the instance Inst_ArmMemInterface/RAM_INST/ram_reg_0 (implemented as a block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+INFO: [Synth 8-4480] The timing for the instance Inst_ArmMemInterface/RAM_INST/ram_reg_1 (implemented as a block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+INFO: [Synth 8-4480] The timing for the instance Inst_ArmMemInterface/RAM_INST/ram_reg_2 (implemented as a block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+INFO: [Synth 8-4480] The timing for the instance Inst_ArmMemInterface/RAM_INST/ram_reg_3 (implemented as a block RAM) might be sub-optimal as no optional output register could be merged into the block ram. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8254 ; free virtual = 16554
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++------+--------------+----------+
+|      |BlackBox name |Instances |
++------+--------------+----------+
+|1     |ArmClkGen     |         1|
++------+--------------+----------+
+
+Report Cell Usage: 
++------+-----------------+------+
+|      |Cell             |Count |
++------+-----------------+------+
+|1     |ArmClkGen_bbox_0 |     1|
+|2     |CARRY4           |    31|
+|3     |LUT1             |     4|
+|4     |LUT2             |   157|
+|5     |LUT3             |    90|
+|6     |LUT4             |    74|
+|7     |LUT5             |    36|
+|8     |LUT6             |   114|
+|9     |MUXF7            |     1|
+|10    |RAMB36E1         |     4|
+|11    |FDRE             |   225|
+|12    |FDSE             |    11|
+|13    |IBUF             |     3|
+|14    |OBUF             |     9|
++------+-----------------+------+
+
+Report Instance Areas: 
++------+---------------------------+-------------------------------------+------+
+|      |Instance                   |Module                               |Cells |
++------+---------------------------+-------------------------------------+------+
+|1     |top                        |                                     |   762|
+|2     |  Debouncing_EXT_LDP       |ArmSwitchDebounce                    |    42|
+|3     |    SAMPLE_CLK_GEN         |ArmWaitStateGenAsync                 |    40|
+|4     |  Inst_ArmMemInterface     |ArmMemInterface                      |    82|
+|5     |    RAM_INST               |ArmRAMB_4kx32                        |    82|
+|6     |  Inst_ArmRS232Interface   |ArmRS232Interface                    |   267|
+|7     |    \RS232_RECEIVER.WSG    |ArmWaitStateGenAsync__parameterized0 |    90|
+|8     |  Inst_ArmSystemController |ArmSystemController                  |   359|
++------+---------------------------+-------------------------------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8250 ; free virtual = 16549
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 8 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:17 ; elapsed = 00:00:19 . Memory (MB): peak = 1657.906 ; gain = 112.531 ; free physical = 8295 ; free virtual = 16595
+Synthesis Optimization Complete : Time (s): cpu = 00:00:21 ; elapsed = 00:00:28 . Memory (MB): peak = 1657.906 ; gain = 508.344 ; free physical = 8297 ; free virtual = 16597
+INFO: [Project 1-571] Translating synthesized netlist
+INFO: [Netlist 29-17] Analyzing 39 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+INFO: [Common 17-83] Releasing license: Synthesis
+131 Infos, 63 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:22 ; elapsed = 00:00:29 . Memory (MB): peak = 1664.922 ; gain = 528.758 ; free physical = 8275 ; free virtual = 16575
+INFO: [Common 17-1381] The checkpoint '/home/aminskenderi/hwpti/HWPTI/vivado_blatt5/ArmUncore.runs/synth_1/ArmUncoreTop.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file ArmUncoreTop_utilization_synth.rpt -pb ArmUncoreTop_utilization_synth.pb
+report_utilization: Time (s): cpu = 00:00:00.01 ; elapsed = 00:00:00.04 . Memory (MB): peak = 1701.555 ; gain = 0.000 ; free physical = 8278 ; free virtual = 16579
+INFO: [Common 17-206] Exiting Vivado at Sun Jun  7 19:47:21 2026...

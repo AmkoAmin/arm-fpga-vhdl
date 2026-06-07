@@ -17,6 +17,12 @@ armregaddresstranslation_tb
 e~*.o
 
 # Vivado Projekt-Caches (falls jemand lokal anlegt)
+vivado_blatt5/
+vivado_blatt5_*.tcl
+build_piso/
+build_rs232/
+*.bit
+.Xil/
 *.cache/
 *.hw/
 *.ip_user_files/
