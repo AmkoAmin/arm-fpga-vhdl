@@ -27,8 +27,8 @@ use ieee.std_logic_1164.all;
 
 entity ArmBarrelShifter is
     generic (
-        OPERAND_WIDTH : integer := 4;   -- z.B. 4 oder 32
-        SHIFTER_DEPTH : integer := 2    -- log2(OPERAND_WIDTH), z.B. 2 oder 5
+        OPERAND_WIDTH : integer := 32;  -- z.B. 4 oder 32
+        SHIFTER_DEPTH : integer := 5    -- log2(OPERAND_WIDTH), z.B. 2 oder 5
     );
     port (
         OPERAND     : in  std_logic_vector(OPERAND_WIDTH-1 downto 0);
