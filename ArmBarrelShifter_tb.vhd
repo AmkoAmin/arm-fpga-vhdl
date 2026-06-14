@@ -1,402 +1,384 @@
---------------------------------------------------------------------------------
---  Testbench fuer den 4-Bit ArmBarrelShifter (OPERAND_WIDTH=4, SHIFTER_DEPTH=2).
---
---  Reihenfolge der Testfaelle (entspricht qualitativ Abbildung 1):
---    1.  Kein Shift       (MUX_CTRL="00")
---    2.  Linksshift  LSL  (MUX_CTRL="01")
---    3.  Rechtsshift LSR  (MUX_CTRL="10", ARITH_SHIFT='0')
---    4.  Arithm. RSH ASR  (MUX_CTRL="10", ARITH_SHIFT='1')
---    5.  Rechtsrotation   (MUX_CTRL="11")
---
---  Zusaetzlich werden mehrere Operanden und alle Schiebeweiten (0-3)
---  sowie verschiedene C_IN-Werte getestet.
---------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
+--  Testbench fuer den allgemeinen n-Bit-Shifter. Getestet wird die selbst
+--  implementierte, strukturelle Architektur gegen die vorgegebene Verhaltens-
+--  beschreibung.
+----------------------------------------------------------------------------------
+
+use std.textio.all;
 library ieee;
-use ieee.std_logic_1164.all;
+
+use IEEE.STD_LOGIC_1164.all;
 use ieee.numeric_std.all;
+library work;
+use work.TB_Tools.all;
 
-entity ArmBarrelShifter4Bit_tb is
-end entity ArmBarrelShifter4Bit_tb;
+entity ArmBarrelShifter_tb is
+    generic (
+        --------------------------------------------------------------------------------
+        OPERAND_WIDTH : integer := 32;
+        AMOUNT_WIDTH  : integer := 5;
+        --------------------------------------------------------------------------------
+        --  Die Testbench bricht bei Ueberschreiten folgender Fehlergrenze ab.
+        --  Bei Fehlergrenze 0 werden alle Tests durchgefuehrt und alle Fehler
+        --  ausgegeben.
+        --------------------------------------------------------------------------------
+        BREAK_ON_NUMBER_OF_ERRORS : natural := 100;
+        --------------------------------------------------------------------------------
+        --  Bei Bedarf: Test aller Operationen auf allen Operanden von 0 bis n
+        --  (mit n = (2^32)-1)
+        --------------------------------------------------------------------------------
+        CHECK_ALL : boolean := TRUE;
+        --------------------------------------------------------------------------------
+        --  Statt aller 2^32 Operanden werden nur die ersten (2^32)/(2^TEST_DIVIDER)
+        --  Operanden getestet, TEST_DEVIDER ist zwingend eine Zweierpotenz
+        --------------------------------------------------------------------------------
+        TEST_DIVIDER : integer := 4
+        --------------------------------------------------------------------------------
+     );
+end entity ArmBarrelShifter_tb;
 
-architecture behave of ArmBarrelShifter4Bit_tb is
+architecture behave of ArmBarrelShifter_tb is
 
-    --------------------------------------------------------------------------------
-    --  Komponenten-Deklaration des DUT
-    --------------------------------------------------------------------------------
+    component ArmBarrelShifter_HILEVEL
+    generic (
+        OPERAND_WIDTH : integer;
+        SHIFTER_DEPTH : integer
+    );
+    port (
+        OPERAND     : in  std_logic_vector(OPERAND_WIDTH-1 downto 0);
+        MUX_CTRL    : in  std_logic_vector(1 downto 0);
+        AMOUNT      : in  std_logic_vector(AMOUNT_WIDTH-1 downto 0);
+        ARITH_SHIFT : in  std_logic;
+        C_IN        : in  std_logic;
+        DATA_OUT    : out std_logic_vector(OPERAND_WIDTH-1 downto 0);
+        C_OUT       : out std_logic
+    );
+    end component;
+
     component ArmBarrelShifter
-        generic (
-            OPERAND_WIDTH : integer;
-            SHIFTER_DEPTH : integer
-        );
-        port (
-            OPERAND     : in  std_logic_vector(OPERAND_WIDTH-1 downto 0);
-            MUX_CTRL    : in  std_logic_vector(1 downto 0);
-            AMOUNT      : in  std_logic_vector(SHIFTER_DEPTH-1 downto 0);
-            ARITH_SHIFT : in  std_logic;
-            C_IN        : in  std_logic;
-            DATA_OUT    : out std_logic_vector(OPERAND_WIDTH-1 downto 0);
-            C_OUT       : out std_logic
-        );
+    generic (
+        OPERAND_WIDTH : integer;
+        SHIFTER_DEPTH : integer
+    );
+    port (
+        OPERAND     : in  std_logic_vector(31 downto 0);
+        MUX_CTRL    : in  std_logic_vector(1 downto 0);
+        AMOUNT      : in  std_logic_vector(4 downto 0);
+        ARITH_SHIFT : in  std_logic;
+        C_IN        : in  std_logic;
+        DATA_OUT    : out std_logic_vector(31 downto 0);
+        C_OUT       : out std_logic
+    );
     end component ArmBarrelShifter;
 
-    --------------------------------------------------------------------------------
-    --  Konstanten
-    --------------------------------------------------------------------------------
-    constant CLK_PERIOD   : time    := 20 ns;
-    constant OPERAND_W    : integer := 4;
-    constant SHIFTER_D    : integer := 2;  -- 2^2 = 4
+    constant WORKING_DELAY : time := 10 ns;
+    signal OPERAND         : std_logic_vector(OPERAND_WIDTH-1 downto 0) := (others => '0');
+    signal MUX_CTRL        : std_logic_vector(1 downto 0) := "00";
+    signal AMOUNT          : std_logic_vector(AMOUNT_WIDTH-1 downto 0) := (others => '0');
+    signal ARITH_SHIFT     : std_logic_vector(0 downto 0) := "0";
+    signal C_IN            : std_logic_vector(0 downto 0) := "0";
+    signal DATA_OUT_BEHAVE : std_logic_vector(OPERAND_WIDTH-1 downto 0);
+    signal C_OUT_BEHAVE    : std_logic;
+    signal DATA_OUT_STRUCT : std_logic_vector(OPERAND_WIDTH-1 downto 0);
+    signal C_OUT_STRUCT    : std_logic;
 
-    --------------------------------------------------------------------------------
-    --  Stimulus- und Ergebnissignale
-    --------------------------------------------------------------------------------
-    signal OPERAND     : std_logic_vector(OPERAND_W-1 downto 0) := (others => '0');
-    signal MUX_CTRL    : std_logic_vector(1 downto 0)           := "00";
-    signal AMOUNT      : std_logic_vector(SHIFTER_D-1 downto 0) := (others => '0');
-    signal ARITH_SHIFT : std_logic := '0';
-    signal C_IN        : std_logic := '0';
-    signal DATA_OUT    : std_logic_vector(OPERAND_W-1 downto 0);
-    signal C_OUT       : std_logic;
-
-    --------------------------------------------------------------------------------
-    --  Hilfsprozedur: Stimuli setzen und Ergebnis pruefen
-    --------------------------------------------------------------------------------
-    procedure apply_and_check (
-        signal   s_OPERAND     : out std_logic_vector(OPERAND_W-1 downto 0);
-        signal   s_MUX_CTRL    : out std_logic_vector(1 downto 0);
-        signal   s_AMOUNT      : out std_logic_vector(SHIFTER_D-1 downto 0);
-        signal   s_ARITH_SHIFT : out std_logic;
-        signal   s_C_IN        : out std_logic;
-        constant v_OPERAND     : in  std_logic_vector(OPERAND_W-1 downto 0);
-        constant v_MUX_CTRL    : in  std_logic_vector(1 downto 0);
-        constant v_AMOUNT      : in  std_logic_vector(SHIFTER_D-1 downto 0);
-        constant v_ARITH_SHIFT : in  std_logic;
-        constant v_C_IN        : in  std_logic;
-        constant v_EXPECTED    : in  std_logic_vector(OPERAND_W-1 downto 0);
-        constant v_C_EXPECTED  : in  std_logic;
-        signal   r_DATA_OUT    : in  std_logic_vector(OPERAND_W-1 downto 0);
-        signal   r_C_OUT       : in  std_logic
-    ) is
-    begin
-        s_OPERAND     <= v_OPERAND;
-        s_MUX_CTRL    <= v_MUX_CTRL;
-        s_AMOUNT      <= v_AMOUNT;
-        s_ARITH_SHIFT <= v_ARITH_SHIFT;
-        s_C_IN        <= v_C_IN;
-        wait for CLK_PERIOD;
-
-        assert r_DATA_OUT = v_EXPECTED
-            report "DATA_OUT-Fehler: OPERAND=" & to_hstring(v_OPERAND)
-                & " MUX=" & to_string(v_MUX_CTRL)
-                & " AMT=" & to_string(v_AMOUNT)
-                & " ARITH=" & std_logic'image(v_ARITH_SHIFT)
-                & " CIN=" & std_logic'image(v_C_IN)
-                & "  => erwartet " & to_hstring(v_EXPECTED)
-                & " erhalten " & to_hstring(r_DATA_OUT)
-            severity error;
-
-        assert r_C_OUT = v_C_EXPECTED
-            report "C_OUT-Fehler:   OPERAND=" & to_hstring(v_OPERAND)
-                & " MUX=" & to_string(v_MUX_CTRL)
-                & " AMT=" & to_string(v_AMOUNT)
-                & " ARITH=" & std_logic'image(v_ARITH_SHIFT)
-                & " CIN=" & std_logic'image(v_C_IN)
-                & "  => erwartet C=" & std_logic'image(v_C_EXPECTED)
-                & " erhalten C=" & std_logic'image(r_C_OUT)
-            severity error;
-    end procedure apply_and_check;
-
+    signal AMT_INT : integer;
+    signal OP_INT  : integer;
+    signal MUX_INT : integer range 0 to 3;
+    type MUX_CTRL_NAMES_TYPE is array(0 to 3) of STRING(1 to 14);
+    constant MUX_CTRL_NAMES : MUX_CTRL_NAMES_TYPE :=("kein Shift    ", "Linksshift    ", "Rechtsshift   ", "Rechtsrotation");
 begin
+    INST_STRUCTURE: ArmBarrelShifter
+    generic map(
+        OPERAND_WIDTH => 32,
+        SHIFTER_DEPTH => 5
+    )
+    port map (
+        OPERAND     => OPERAND,
+        MUX_CTRL    => MUX_CTRL,
+        AMOUNT      => AMOUNT,
+        ARITH_SHIFT => ARITH_SHIFT(0),
+        C_IN        => C_IN(0),
+        DATA_OUT    => DATA_OUT_STRUCT,
+        C_OUT       => C_OUT_STRUCT
+    );
 
-    --------------------------------------------------------------------------------
-    --  DUT-Instanziierung
-    --------------------------------------------------------------------------------
-    DUT : ArmBarrelShifter
-        generic map (
-            OPERAND_WIDTH => OPERAND_W,
-            SHIFTER_DEPTH => SHIFTER_D
-        )
-        port map (
-            OPERAND     => OPERAND,
-            MUX_CTRL    => MUX_CTRL,
-            AMOUNT      => AMOUNT,
-            ARITH_SHIFT => ARITH_SHIFT,
-            C_IN        => C_IN,
-            DATA_OUT    => DATA_OUT,
-            C_OUT       => C_OUT
-        );
+    INST_HILEVEL: ArmBarrelShifter_HILEVEL
+    generic map(
+        OPERAND_WIDTH => 32,
+        SHIFTER_DEPTH => 5
+    )
+    port map(
+        OPERAND     => OPERAND,
+        MUX_CTRL    => MUX_CTRL,
+        AMOUNT      => AMOUNT,
+        ARITH_SHIFT => ARITH_SHIFT(0),
+        C_IN        => C_IN(0),
+        DATA_OUT    => DATA_OUT_BEHAVE,
+        C_OUT       => C_OUT_BEHAVE
+    );
 
-    --------------------------------------------------------------------------------
-    --  Stimulusprozess
-    --------------------------------------------------------------------------------
-    stimulus : process
+    tb : process
+        constant TESTDATA_PATH : string  := TESTDATA_FOLDER_PATH & "/BARRELSHIFTER_TESTDATA";
+        file TESTDATA_FILE                  : text open read_mode is TESTDATA_PATH;
+        variable DATA_LINE                  : line;
+        variable IS_COMMENT                 : boolean := false;
+        variable SLV_VAR                    : std_logic_vector(OPERAND'length-1 downto 0);
+        variable errors_encountered         : integer := 0;
+        variable overall_errors_encountered : integer := 0;
+        variable ITERATIONS                 : integer := 0;
+        variable AMOUNT_MIN, AMOUNT_MAX, VALUE_MIN, VALUE_MAX : natural;
+        variable RESULT_ERRORS, C_ERRORS    : natural := 0;
+        variable V_MUX_CTRL                 : std_logic_vector(1 downto 0);
+        variable V_ARITH                    : std_logic_vector(0 downto 0);
+        variable V_CARRY                    : std_logic_vector(0 downto 0);
+        variable V_AMOUNT                   : std_logic_vector(AMOUNT_WIDTH -1 downto 0) := (others => '0');
+        variable V_VALUE                    : std_logic_vector(OPERAND_WIDTH -1 downto 0) := (others => '0');
+        variable RESULT_ERROR, C_ERROR      : boolean := FALSE;
 
-        -- Konstante Testwerte fuer einfachen Zugriff
-        --  Operanden
-        constant OP_A  : std_logic_vector(3 downto 0) := "1010";  -- 0xA
-        constant OP_B  : std_logic_vector(3 downto 0) := "0101";  -- 0x5
-        constant OP_C  : std_logic_vector(3 downto 0) := "1111";  -- 0xF (alle 1)
-        constant OP_D  : std_logic_vector(3 downto 0) := "0000";  -- 0x0 (alle 0)
-        constant OP_E  : std_logic_vector(3 downto 0) := "1001";  -- 0x9
-        constant OP_F  : std_logic_vector(3 downto 0) := "0110";  -- 0x6
+        -- Procedure fuer Test der Ergebnisse und Ausgabe der vollstaendigen Fehlermeldung
+        procedure REPORT_BARRELSHIFTER_OPERATION is
+        begin
+            RESULT_ERROR := FALSE; C_ERROR := FALSE;
+            if DATA_OUT_STRUCT /= DATA_OUT_BEHAVE then
+                RESULT_ERROR  := TRUE;
+                RESULT_ERRORS := RESULT_ERRORS + 1;
+            end if;
+            if C_OUT_STRUCT /= C_OUT_BEHAVE then
+                C_ERROR  := TRUE;
+                C_ERRORS := C_ERRORS + 1;
+            end if;
 
-        -- Schiebeweiten als 2-Bit-Vektoren
-        constant AMT0  : std_logic_vector(1 downto 0) := "00";
-        constant AMT1  : std_logic_vector(1 downto 0) := "01";
-        constant AMT2  : std_logic_vector(1 downto 0) := "10";
-        constant AMT3  : std_logic_vector(1 downto 0) := "11";
-
+            if RESULT_ERROR or C_ERROR then
+                report "Fehler aufgetreten..." severity error;
+                errors_encountered := errors_encountered + 1;
+                if RESULT_ERROR then assert FALSE report "Ergebnis fehlerhaft" severity note; end if;
+                if C_ERROR then assert FALSE report "Carry fehlerhaft" severity note; end if;
+                report TAB_CHAR & "MUX_CTRL: "  & TAB_CHAR & SLV_TO_STRING(MUX_CTRL) & " = " & TAB_CHAR & MUX_CTRL_NAMES(to_integer(unsigned(MUX_CTRL)));
+                report TAB_CHAR & "OPERAND: "   & TAB_CHAR & SLV_TO_STRING(OPERAND);
+                report TAB_CHAR & "AMOUNT: "    & TAB_CHAR & SLV_TO_STRING(AMOUNT) & " = " & TAB_CHAR & integer'image(to_integer(unsigned(AMOUNT)));
+                report TAB_CHAR & "ARITH: "     & TAB_CHAR & TAB_CHAR & SLV_TO_STRING(ARITH_SHIFT);
+                report TAB_CHAR & "C_IN: "      & TAB_CHAR & TAB_CHAR & SLV_TO_STRING(C_IN);
+                report " ";
+                if RESULT_ERROR then
+                    report TAB_CHAR & "Referenzergebnis: " & TAB_CHAR & TAB_CHAR & SLV_TO_STRING(DATA_OUT_BEHAVE);
+                    report TAB_CHAR & "Ermitteltes Ergebnis: " & TAB_CHAR & SLV_TO_STRING(DATA_OUT_STRUCT);
+                end if;
+                if C_ERROR then
+                    report TAB_CHAR & "C_OUT der Referenz: " & TAB_CHAR & SL_TO_STRING(C_OUT_BEHAVE);
+                    report TAB_CHAR & "Ermitteltes C_OUT: " & TAB_CHAR & TAB_CHAR & SL_TO_STRING(C_OUT_STRUCT);
+                end if;
+                report SEPARATOR_LINE;
+            end if;
+        end procedure;
     begin
+        -- Die Schiebeweite kann bei 5 Bit breiter Werteangabe 0 bis 31 Bit betragen
+        AMOUNT_MIN := 0;
+        AMOUNT_MAX := (2**(AMOUNT_WIDTH)) -1;
+        -- Um nicht mit 2^32 verschiedenen Operanden zu testen kann die Zahl mittels TEST_DEVIDER verringert werden.
+        -- mit TEST_DIVIDER = 8 => (2**32/8) -1 = 16 verschiedene Operanden; fuer 4: 256 Operanden
+        VALUE_MIN := 0;
+        VALUE_MAX := (2**(OPERAND_WIDTH/TEST_DIVIDER)) -1;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report "Beginn der Simulation...";
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        --------------------------------------------------------------------------------
+        --  Abschnitt fuer Test auf Vollstaendigkeit der Sensitivitaetsliste
+        --------------------------------------------------------------------------------
+        report "Test auf unmittelbare Reaktion auf Aenderungen einzelner Eingangssignale. Ein Fehler in diesen Tests kann auf eine unvollstaendige Sensitivitaetsliste hinweisen." severity note;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report "Initialisierung aller Stimuli, anschliessend Aenderung einzelner Signale...";
+        report SEPARATOR_LINE;
+        OPERAND <= X"F0000001"; MUX_CTRL <= "00"; ARITH_SHIFT <= "0"; C_IN <= "0"; AMOUNT <= "00001";
+        wait for WORKING_DELAY;
+        REPORT_BARRELSHIFTER_OPERATION;
+        report SEPARATOR_LINE;
+        report "Aenderung von C_IN";
+        C_IN <= "1";
+        wait for WORKING_DELAY;
+        REPORT_BARRELSHIFTER_OPERATION;
+        report SEPARATOR_LINE;
+        report "Aenderung von MUX_CTRL";
+        MUX_CTRL <= "10";
+        wait for WORKING_DELAY;
+        REPORT_BARRELSHIFTER_OPERATION;
+        report SEPARATOR_LINE;
+        report "Aenderung von ARITH_SHIFT";
+               ARITH_SHIFT <= "1";
+        wait for WORKING_DELAY;
+        REPORT_BARRELSHIFTER_OPERATION;
+        report SEPARATOR_LINE;
+        report "Aenderung von AMOUNT";
+        AMOUNT <= "00010";
+        wait for WORKING_DELAY;
+        REPORT_BARRELSHIFTER_OPERATION;
+        report SEPARATOR_LINE;
+        report "Aenderung von OPERAND";
+        OPERAND <= X"70000001";
+        wait for WORKING_DELAY;
+        REPORT_BARRELSHIFTER_OPERATION;
+        report SEPARATOR_LINE;
+        report "Test auf Verhalten bei Aenderung einzelner Eingangssignale beendet.";
+        if((RESULT_ERRORS > 0) OR (C_ERRORS > 0))then
+            report "Es sind Fehler aufgetreten." severity note;
+            report "Es sind Fehler bei der Aenderung einzelner Eingangssignale aufgetreten." severity error;
+        else
+            report "Es sind keine Fehler aufgetreten." severity note;
+        end if;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report "Ruecksetzen aller Stimuli.";
+        OPERAND <= X"00000000"; MUX_CTRL <= "00"; ARITH_SHIFT <= "0"; C_IN <= "0"; AMOUNT <= "00000";
+        RESULT_ERRORS := 0; C_ERRORS := 0;
+        wait for WORKING_DELAY;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report " ";
+        report " ";
 
         --------------------------------------------------------------------------------
-        --  Initialzustand
+        --  optional: Test aller Operationen auf beliebig vielen Operanden
+        --  von 0 bis (2^32)-1, ermoeglicht bei Bedarf Test aller Stimuli-
+        --  kombinationen
         --------------------------------------------------------------------------------
-        OPERAND <= (others => '0'); MUX_CTRL <= "00";
-        AMOUNT  <= (others => '0'); ARITH_SHIFT <= '0'; C_IN <= '0';
-        wait for CLK_PERIOD;
+        if CHECK_ALL then
+            report SEPARATOR_LINE;
+            report "Teste Operanden zwischen 0 und " & integer'image(VALUE_MAX) & " mit allen moeglichen Operationen und Schiebe-/Rotationsweiten";
+            report SEPARATOR_LINE;
+            report SEPARATOR_LINE;
+            for value in VALUE_MIN to VALUE_MAX loop
+                for mux in 0 to 3 loop
+                    for arith in 0 to 1 loop
+                        -- Test mit Carry-Bit = 0/1
+                        for carry in 0 to 1 loop
+                            -- Test aller moeglichen Schiebeweiten
+                            LOOP_AMOUNT : for am in AMOUNT_MIN to AMOUNT_MAX loop
+                                V_MUX_CTRL  := std_logic_vector(to_unsigned(mux,2));
+                                V_ARITH     := std_logic_vector(to_unsigned(arith,1));
+                                V_CARRY     := std_logic_vector(to_unsigned(carry,1));
+                                V_AMOUNT    := std_logic_vector(to_unsigned(am,AMOUNT_WIDTH));
+                                V_VALUE     := std_logic_vector(to_signed(value,OPERAND_WIDTH));
+                                MUX_CTRL    <= V_MUX_CTRL;
+                                ARITH_SHIFT <= V_ARITH;
+                                C_IN        <= V_CARRY;
+                                AMOUNT      <= V_AMOUNT;
+                                OPERAND     <= V_VALUE;--
+                                wait for WORKING_DELAY;
+                                REPORT_BARRELSHIFTER_OPERATION;
+                                ITERATIONS := ITERATIONS + 1;
+                                assert (BREAK_ON_NUMBER_OF_ERRORS = 0) or (overall_errors_encountered <= BREAK_ON_NUMBER_OF_ERRORS) report "Breche Simulation wegen Ueberschreitung von mehr als " & natural'image(BREAK_ON_NUMBER_OF_ERRORS) & " fehlerhaften Testdatensaetzen ab!" severity failure;
+                                -- Shifterausgaenge neutralisieren
+                                OPERAND <= (others => '0'); MUX_CTRL <= (others => '0'); AMOUNT <= (others => '0'); C_IN <= (others => '0'); ARITH_SHIFT <= (others => '0');
+                                wait for WORKING_DELAY/2;
+                                -- schlaegt eine Operation fuer eine Schiebeweite fehl ist es unwahrscheinlich, dass sie bei groesseren
+                                -- Schiebeweiten wieder korrekt funktioniert => Abbruch der inneren Schleife
+                                if C_ERROR or RESULT_ERROR then
+                                    report "Breche Schleife fuer AMOUNT ab und fahre mit der naechsten Kombination der uebrigen Testsignale fort.";
+                                    report SEPARATOR_LINE;
+                                    exit LOOP_AMOUNT;
+                                end if;
+                            end loop LOOP_AMOUNT;
+                        end loop;
+                    end loop;
+                end loop;
+            end loop;
+            report SEPARATOR_LINE;
+            report "Iterationen ueber zusammenhaengede Testdaten ausgefuehrt: " & integer'image(ITERATIONS);
+            report "Fehler erkannt in " & integer'image(errors_encountered) & " Datensaetzen.";
+            report SEPARATOR_LINE;
+            report SEPARATOR_LINE;
+            report SEPARATOR_LINE;
+            report SEPARATOR_LINE;
+            report SEPARATOR_LINE;
+            report SEPARATOR_LINE;
+            overall_errors_encountered := errors_encountered;
+            ITERATIONS := 0;
+            errors_encountered := 0;
+            report " ";
+            report " ";
+        end if;
 
-        report "============================================================";
-        report " Test 1: Kein Shift (MUX_CTRL = 00)";
-        report "============================================================";
+        --------------------------------------------------------------------------------
+        --  Test aller Operationen und Schiebeweiten auf Operanden
+        --  aus einer Testvektordatei
+        --------------------------------------------------------------------------------
 
-        -- Kein Shift: Operand bleibt unveraendert, C_OUT = C_IN
-        -- Weite 0, C_IN=0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"00",AMT0,'0','0',  OP_A,'0',  DATA_OUT,C_OUT);
-        -- Weite 0, C_IN=1 => C_OUT muss = C_IN = '1'
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"00",AMT0,'0','1',  OP_A,'1',  DATA_OUT,C_OUT);
-        -- Weite 1: MUX_CTRL=00 => trotzdem kein Shift
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"00",AMT1,'0','0',  OP_A,'0',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"00",AMT2,'0','1',  OP_B,'1',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"00",AMT3,'0','0',  OP_C,'0',  DATA_OUT,C_OUT);
-
-
-        report "============================================================";
-        report " Test 2: Linksshift LSL (MUX_CTRL = 01)";
-        report "============================================================";
-
-        --  OP_A = 1010
-        --  LSL 0: 1010, C_OUT = C_IN
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"01",AMT0,'0','0',  "1010",'0',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"01",AMT0,'0','1',  "1010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, LSL 1: 0100, C_OUT = herausgeschobenes Bit = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"01",AMT1,'0','0',  "0100",'1',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, LSL 2: 1000, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"01",AMT2,'0','0',  "1000",'0',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, LSL 3: 0000, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"01",AMT3,'0','0',  "0000",'1',  DATA_OUT,C_OUT);
-
-        --  OP_B = 0101, LSL 1: 1010, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"01",AMT1,'0','0',  "1010",'0',  DATA_OUT,C_OUT);
-
-        --  OP_B = 0101, LSL 2: 0100, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"01",AMT2,'0','0',  "0100",'1',  DATA_OUT,C_OUT);
-
-        --  OP_C = 1111, LSL 1: 1110, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"01",AMT1,'0','0',  "1110",'1',  DATA_OUT,C_OUT);
-
-        --  OP_C = 1111, LSL 3: 1000, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"01",AMT3,'0','0',  "1000",'1',  DATA_OUT,C_OUT);
-
-        --  OP_E = 1001, LSL 1: 0010, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_E,"01",AMT1,'0','1',  "0010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_E = 1001, LSL 3: 1000, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_E,"01",AMT3,'0','0',  "1000",'0',  DATA_OUT,C_OUT);
-
-
-        report "============================================================";
-        report " Test 3: Logischer Rechtsshift LSR (MUX_CTRL = 10, ARITH='0')";
-        report "============================================================";
-
-        --  OP_A = 1010, LSR 0: 1010, C_OUT = C_IN
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT0,'0','0',  "1010",'0',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT0,'0','1',  "1010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, LSR 1: 0101, C_OUT = 0 (herausgeschobenes LSB)
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT1,'0','0',  "0101",'0',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, LSR 2: 0010, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT2,'0','0',  "0010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, LSR 3: 0001, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT3,'0','0',  "0001",'0',  DATA_OUT,C_OUT);
-
-        --  OP_B = 0101, LSR 1: 0010, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"10",AMT1,'0','0',  "0010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_C = 1111, LSR 1: 0111, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"10",AMT1,'0','0',  "0111",'1',  DATA_OUT,C_OUT);
-
-        --  OP_C = 1111, LSR 3: 0001, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"10",AMT3,'0','0',  "0001",'1',  DATA_OUT,C_OUT);
-
-        --  OP_F = 0110, LSR 2: 0001, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_F,"10",AMT2,'0','0',  "0001",'1',  DATA_OUT,C_OUT);
-
-
-        report "============================================================";
-        report " Test 4: Arithmetischer Rechtsshift ASR (MUX_CTRL=10, ARITH='1')";
-        report "============================================================";
-
-        --  OP_A = 1010 (MSB=1, negativ): Fuellbit = 1
-        --  ASR 0: 1010, C_OUT = C_IN
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT0,'1','0',  "1010",'0',  DATA_OUT,C_OUT);
-
-        --  ASR 1: 1101, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT1,'1','0',  "1101",'0',  DATA_OUT,C_OUT);
-
-        --  ASR 2: 1110, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT2,'1','0',  "1110",'1',  DATA_OUT,C_OUT);
-
-        --  ASR 3: 1111, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"10",AMT3,'1','0',  "1111",'0',  DATA_OUT,C_OUT);
-
-        --  OP_B = 0101 (MSB=0, positiv): Fuellbit = 0 => wie LSR
-        --  ASR 1: 0010, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"10",AMT1,'1','0',  "0010",'1',  DATA_OUT,C_OUT);
-
-        --  ASR 2: 0001, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"10",AMT2,'1','0',  "0001",'0',  DATA_OUT,C_OUT);
-
-        --  OP_C = 1111 (MSB=1): ASR 2: 1111, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"10",AMT2,'1','0',  "1111",'1',  DATA_OUT,C_OUT);
-
-        --  OP_E = 1001 (MSB=1): ASR 1: 1100, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_E,"10",AMT1,'1','0',  "1100",'1',  DATA_OUT,C_OUT);
-
-        --  OP_E = 1001: ASR 3: 1111, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_E,"10",AMT3,'1','0',  "1111",'0',  DATA_OUT,C_OUT);
-
-
-        report "============================================================";
-        report " Test 5: Rechtsrotation ROR (MUX_CTRL = 11)";
-        report "============================================================";
-
-        --  OP_A = 1010, ROR 0: 1010, C_OUT = C_IN
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"11",AMT0,'0','0',  "1010",'0',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"11",AMT0,'0','1',  "1010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, ROR 1: 0101, C_OUT = 0 (herausgeschobenes Bit 0)
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"11",AMT1,'0','0',  "0101",'0',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, ROR 2: 1010, C_OUT = 1
-        --  (1010 ROR 2 => 10|10 -> 10|10 = 1010, letztes herausgeschobenes Bit war Bit1 = 1)
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"11",AMT2,'0','0',  "1010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_A = 1010, ROR 3: 0101...
-        --  1010 ROR 3: nehme die unteren 3 Bits (010) und schiebe sie nach oben
-        --  => 010|1 => 0101, C_OUT = Bit2 = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_A,"11",AMT3,'0','0',  "0101",'0',  DATA_OUT,C_OUT);
-
-        --  OP_B = 0101, ROR 1: 1010, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"11",AMT1,'0','0',  "1010",'1',  DATA_OUT,C_OUT);
-
-        --  OP_B = 0101, ROR 2: 0101, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_B,"11",AMT2,'0','0',  "0101",'0',  DATA_OUT,C_OUT);
-
-        --  OP_C = 1111, ROR 1: 1111, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_C,"11",AMT1,'0','0',  "1111",'1',  DATA_OUT,C_OUT);
-
-        --  OP_D = 0000, ROR 1: 0000, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_D,"11",AMT1,'0','0',  "0000",'0',  DATA_OUT,C_OUT);
-
-        --  OP_E = 1001, ROR 1: 1100, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_E,"11",AMT1,'0','0',  "1100",'1',  DATA_OUT,C_OUT);
-
-        --  OP_E = 1001, ROR 3: 0011, C_OUT = 0
-        --  1001 ROR 3: (001) -> high, (1) -> low => 0011, C_OUT = Bit2 = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_E,"11",AMT3,'0','0',  "0011",'0',  DATA_OUT,C_OUT);
-
-
-        report "============================================================";
-        report " Test 6: Zusaetzliche Operanden / Sonderfaelle";
-        report "============================================================";
-
-        --  Alle Nullen, jede Operation, jede Weite => immer 0000, C_OUT = 0 oder C_IN
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_D,"01",AMT0,'0','1',  "0000",'1',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_D,"01",AMT1,'0','0',  "0000",'0',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_D,"10",AMT2,'0','0',  "0000",'0',  DATA_OUT,C_OUT);
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_D,"11",AMT3,'0','0',  "0000",'0',  DATA_OUT,C_OUT);
-
-        --  OP_F = 0110: Verschiedene Operationen
-        --  LSL 1: 1100, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_F,"01",AMT1,'0','0',  "1100",'0',  DATA_OUT,C_OUT);
-        --  LSR 1: 0011, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_F,"10",AMT1,'0','0',  "0011",'0',  DATA_OUT,C_OUT);
-        --  ASR 1 (MSB=0): 0011, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_F,"10",AMT1,'1','0',  "0011",'0',  DATA_OUT,C_OUT);
-        --  ROR 1: 0011, C_OUT = 0
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_F,"11",AMT1,'0','0',  "0011",'0',  DATA_OUT,C_OUT);
-        --  ROR 2: 1001, C_OUT = 1
-        apply_and_check(OPERAND,MUX_CTRL,AMOUNT,ARITH_SHIFT,C_IN,
-            OP_F,"11",AMT2,'0','0',  "1001",'1',  DATA_OUT,C_OUT);
-
-        -- Reset am Ende
-        OPERAND <= (others => '0'); MUX_CTRL <= "00";
-        AMOUNT  <= (others => '0'); ARITH_SHIFT <= '0'; C_IN <= '0';
-        wait for CLK_PERIOD;
-
-        report "============================================================";
-        report " ArmBarrelShifter4Bit_tb: Alle Testfaelle abgeschlossen.";
-        report "============================================================";
-        report "EOT" severity failure;  -- Simulation beenden
-
-        wait;
-    end process stimulus;
-
+        -- Raum fuer gezielte Testoperanden, da natuerlich nicht mehr alle Faelle getestet werden koennen
+        report "Test mit spezifischen Operanden-Testvektoren aus der Testvektordatei, jeweils mit allen Optionen und Weiten." severity note;
+        while not endfile(TESTDATA_FILE)loop
+            readline(TESTDATA_FILE,DATA_LINE);
+            LINE_IS_COMMENT(DATA_LINE,IS_COMMENT);
+            if( IS_COMMENT) then
+                next;
+            else
+                GET_LOGIC_VECTOR_FROM_LINE(DATA_LINE,SLV_VAR);
+                V_VALUE := SLV_VAR;
+                report SEPARATOR_LINE;
+                report SEPARATOR_LINE;
+                report "OPERAND: " & SLV_TO_STRING(V_VALUE);
+                report SEPARATOR_LINE;
+                report SEPARATOR_LINE;
+                for mux in 0 to 3 loop
+                    for arith in 0 to 1 loop
+                        for carry in 0 to 1 loop
+                            LOOP_AMOUNT_2 : for am in AMOUNT_MIN to AMOUNT_MAX loop
+                                V_MUX_CTRL  := std_logic_vector(to_unsigned(mux,2));
+                                V_ARITH     := std_logic_vector(to_unsigned(arith,1));
+                                V_CARRY     := std_logic_vector(to_unsigned(carry,1));
+                                V_AMOUNT    := std_logic_vector(to_unsigned(am,AMOUNT_WIDTH));
+                                OPERAND     <= V_VALUE;
+                                MUX_CTRL    <= V_MUX_CTRL;
+                                ARITH_SHIFT <= V_ARITH;
+                                C_IN        <= V_CARRY;
+                                AMOUNT      <= V_AMOUNT;
+                                wait for WORKING_DELAY;
+                                REPORT_BARRELSHIFTER_OPERATION;
+                                ITERATIONS := ITERATIONS + 1;
+                                assert (BREAK_ON_NUMBER_OF_ERRORS = 0) or (overall_errors_encountered <= BREAK_ON_NUMBER_OF_ERRORS) report "Breche Simulation wegen Ueberschreitung von mehr als " & natural'image(BREAK_ON_NUMBER_OF_ERRORS) & "  fehlerhaften Testdatensaetzen ab!" severity failure;
+                                -- Shifterausgaenge neutralisieren
+                                OPERAND <= (others => '0'); MUX_CTRL <= (others => '0'); AMOUNT <= (others => '0'); C_IN <= (others => '0'); ARITH_SHIFT <= (others => '0');
+                                wait for WORKING_DELAY/2;
+                                if C_ERROR or RESULT_ERROR then
+                                report "Breche Schleife fuer AMOUNT ab und fahre mit der naechsten Kombination der uebrigen Testsignale fort.";
+                                report SEPARATOR_LINE;
+                                exit LOOP_AMOUNT_2;
+                                end if;
+                            end loop LOOP_AMOUNT_2;
+                        end loop;
+                    end loop;
+                end loop;
+            end if;
+        end loop;
+        FILE_CLOSE(TESTDATA_FILE);
+        report "Iterationen ueber Testvektoren aus der Testvektordatei ausgefuehrt: " & integer'image(ITERATIONS);
+        report "Fehler darin erkannt in " & integer'image(errors_encountered) & " Datensaetzen.";
+        overall_errors_encountered := errors_encountered + overall_errors_encountered;
+        if(overall_errors_encountered > 0 )then
+            report "Fehler ueber alle Datensaetze: " & integer'image(overall_errors_encountered) severity note;
+        else
+            report "Keine Fehler gefunden" severity note;
+        end if;
+        report " ";
+        report " ";
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        if overall_errors_encountered = 0 then
+              report "Funktionspruefung bestanden." severity note;
+          else
+              report "Funktionspruefung nicht bestanden." severity error;
+               end if;
+        report SEPARATOR_LINE;
+        report SEPARATOR_LINE;
+        report "...Ende der Simulation." severity note;
+        report " ";
+        report " ";
+        report " EOT (END OF TEST) - Diese Fehlermeldung stoppt den Simulator unabhaengig von tatsaechlich aufgetretenen Fehlern!" severity failure;
+        wait; -- will wait forever
+    end process tb;
+    --  End Test Bench
 end architecture behave;

@@ -1,4 +1,4 @@
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 --  Datenreplikationseinheit fuer den Kern des ARM-SoC
 --------------------------------------------------------------------------------
 --  Die Datenreplikationseinheit kann in der EX- oder MEM-Stufe
@@ -7,7 +7,7 @@
 --  Halbworte (immer die niederwertigen 16 Bit eines Datums aus einem ARM-
 --  Register) werden auf dem niederwertigen und hochwertigen Halbwort
 --  des Datenbus ausgegeben und Bytes auf alle 4 Bytes des Datenbus
---  repliziert. Auf diese Weise kann ohne weitere Anpassungen
+--  repliziert. Aunn ohne weitere Anpassungen
 --  in Little Endian und Big Endian Speicher geschrieben werden.
 --------------------------------------------------------------------------------
 library ieee;
@@ -30,7 +30,7 @@ begin
     begin
         case DRP_DMAS is
 
-            -- Wort unverändert weitergeben
+            -- Wort unveraendert weitergeben
             when DMAS_WORD  =>
                 DRP_OUTPUT <= DRP_INPUT;
 
