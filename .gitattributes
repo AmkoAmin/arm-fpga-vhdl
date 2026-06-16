@@ -1,0 +1,5 @@
+# Course-provided framework (TU Berlin, Chair of Embedded Systems Architecture).
+# Excluded from GitHub language stats so they reflect our own work:
+# the architecture bodies of the design modules in src/.
+sim/** linguist-vendored
+src/packages/** linguist-vendored
