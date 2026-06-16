@@ -56,16 +56,31 @@ Teammates contributed further modules and testbenches — the commit history sho
 The provided template code remains the intellectual property of the TU Berlin chair and is
 included here only to keep the project self-contained.
 
+## Repository structure
+
+```
+src/
+  packages/        shared types & configuration (ArmTypes, ArmConfiguration, ArmFilePaths)
+  datapath/        barrel shifter, shifter, data replication
+  register-file/   register file, register-address translation, RAM32M primitive
+  core/            instruction address register & history buffer
+  memory/          4K×32 RAM block, memory interface
+  serial-io/       RS232 interface, PISO shift register
+  uncore/          top level, system controller, chip-select, clocking glue
+sim/               testbenches, test helpers and test vectors (sim/data/)
+constraints/       Basys 3 pin/timing constraints (.xdc)
+```
+
+> Files under `src/packages/` and most testbenches in `sim/` are part of the
+> course-provided framework; the architecture bodies of the design modules are the
+> team's own work (see [Provided vs. implemented](#provided-vs-implemented)).
+
 ## Tech stack
 
 - **VHDL** (IEEE 1076)
 - **Xilinx Vivado** — synthesis, implementation, IP (Clocking Wizard)
-- **Simulation** — Vivado XSim / GHDL, driven via a `Makefile`
+- **Simulation** — Vivado XSim / GHDL
 - **Target hardware** — Basys 3 board, Artix-7 FPGA
 
-## Build & simulate
-
-```bash
-make            # see the Makefile for available simulation/build targets
-```
-Simulation and Vivado project artifacts are excluded via `.gitignore`.
+Each module is verified by its testbench in `sim/`. Generated simulation and Vivado
+project artifacts are excluded via `.gitignore`.
