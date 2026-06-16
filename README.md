@@ -1,56 +1,71 @@
-# Hardwarepraktikum SoSe26
+# ARM Processor System on FPGA (VHDL)
 
-**ausführliche Informationen auf gesonderter Anleitung im ISIS-Kurs**
+Implementation of core components of an **ARMv4-compatible processor system** in VHDL,
+verified in simulation and synthesized onto a **Basys 3 (Xilinx Artix-7)** FPGA.
 
-## Repository einrichten
-1. Lokal klonen (siehe unten)
-2. Im Ordner *make setup* ausführen
-3. Den Anweisungen folgen
+Built during the *Hardwarepraktikum* (hardware lab) at the Technical University of Berlin
+(Chair of Embedded Systems Architecture). Team project (group Di-12-7).
 
-## GIT
-* Git ist eine Versionierungssoftware wie z.B. SVN
-* Git ist dezentral (es gibt zunächst erstmal keinen Server, der einem Dinge vorschreibt)
-* ein Git-Repository ist eine Sammlung von **Commits**
-* ein **Commit** ist eine Zusammenfassung von Änderungen
+> **Note on scope:** This builds on a course-provided framework. The chair supplied the
+> module *interfaces* (VHDL entities, shared type/configuration packages, and testbenches);
+> our work was implementing the *behaviour* — the architecture bodies — of the individual
+> modules and getting the whole uncore to simulate and synthesize. See
+> [Provided vs. implemented](#provided-vs-implemented).
 
-### Workflow
+---
 
-* etwas 'hochladen': Datei **X** hat Änderungen oder ist neu
- 1. *git add X*: fügt die Datei zum nächsten **Commit** hinzu
- 2. *git status*: überprüfen, ob wirklich nur die gewünschten Dateien in den **Commit** kommen
- 3. *git diff --staged*: optional: Überprüfung, welche Änderungen vorgenommen werden
- 5. *git commit -m "**X wurde aktualisiert**"*: erzeugt den **Commit** mit dem Kommentar "**X wurde aktualisiert**"
-   * dieser **Commit** wurde nun aussschließlich im lokalen Repository erstellt
- 6. *git push*: sendet die neue **Commits** zum Server
+## Overview
 
+The system is assembled step by step across several lab sheets, from individual processor
+building blocks up to a complete "uncore" (everything around the CPU core) that boots, loads
+a program over a serial link, and runs on real hardware:
 
-* lokales Repoitory aktualisieren
- 1. *git status*: überprüfen, ob man selbst ein *sauberes* Repository hat (keine ungesicherten Änderungen)
- 2. *git pull: holt neue **Commits** vom Server
- 3. Es kann nun zu einem **Merge conflict** kommen
-   * Die neuen Änderungen lassen sich nicht auf die lokalen Daten anwenden
-   * Es muss nun ein *Merge Commit* gemacht werden
-      1. Git hat automatische alle unbetroffenen Dateien zu diesem Commit hinzugefügt
-      2. Mit *git status* überprüfen, welche Dateien betroffen sind
-      3. Die Dateien öffnen und schauen, welche Änderungen nicht umsetztbar sind
-      4. Sich für eine Variante entscheiden (im Notfall fragen)
-      5. Mit *git add* die betroffenen Dateien zum *merge Commit* hinzufügen
-      6. *git commit*
+- **Processor building blocks** — data replication unit, instruction address register
+- **Register subsystem** — mode-dependent register-address translation, distributed-RAM
+  register file built from Xilinx `RAM32M` primitives
+- **Memory subsystem** — 4K×32 RAM block and memory interface
+- **Serial I/O** — RS232 interface with a PISO (parallel-in / serial-out) shift register
+- **Uncore integration** — clock generation (MMCM/PLL IP), top-level wiring, behavioural
+  simulation, synthesis and a hardware bring-up on the Basys 3 board
 
-### wichtige Git-Befehle
-| Befehl                         | Beschreibung
-| :----------------------------- | :-------------
-| git clone *repo-uri*           | Kopiert (klont) ein vorhandenes Repository auf den lokalen Rechner
-| git status                     | Zeigt den Status aller Änderungen an und welche zum nächsten Commit gehören
-| git add *datei*                | Fügt Änderungen (und neu Dateien) zu dem nächsten Commit hinzu
-| git reset *datei*              | Entfernt Dateien vom nächsten Commit, welche mit add hinzugefügt worden sind
-| git diff                       | Listet alle Änderungen, welche in keinem Commit sind
-| git diff --staged              | Listet alle Änderungen, welche mit *git add* hinzugefügt worden sind
-| git rm *datei*                 | Entfernt die Datei aus Git und löscht sie auch lokal.
-| git commit -m "*Beschreibung*“ | Fasst alle vorgemerkten Änderungen (git add) zu einem commit zusammen mit der angegebenen Beschreibung.
-| git pull                       | Holt sich neu Commits vom Mutter-Repository.
-| git push                       | Lädt lokale Commits zum Mutter-Repository hoch.
-| git checkout main -- *datei*           | Setzt alle Änderungen der Datei auf den Stand des letzten Commits zurück.
-| git reset			 | Macht git add rückgängig
-| git reset --hard		 | Löscht alle lokalen Änderungen seit dem letzten Commit (**Vorsicht!**)
-| git pull vorgaben main       | Lädt geänderte Vorlagen aus dem Vorgaben-Repository
+## My contribution
+
+This was a team project; the modules I implemented / worked on:
+
+| Module | What it does |
+|---|---|
+| `ArmDataReplication.vhd` | Replicates a byte / half-word across the 32-bit data bus |
+| `ArmRegaddressTranslation.vhd` | Maps virtual register + CPU mode → physical register address |
+| `DistRAM32M.vhd` | Behavioural model of the Xilinx `RAM32M` distributed-RAM primitive |
+| `ArmRegfile.vhd` | Register file: 3 read / 2 + PC write ports, built from distributed RAM |
+| `ArmRAMB_4kx32.vhd`, `ArmMemInterface.vhd` | 4K×32 RAM block and the memory interface |
+| `PISOShiftReg.vhd`, `ArmRS232Interface.vhd` | Serial transmit path (PISO shift register + RS232) |
+| `ArmBarrelShifter.vhd`, `ArmShifter.vhd` | Barrel shifter / shifter unit |
+| Uncore (Blatt 5) | `ArmClkGen` clock IP, `ArmUncoreTop` behavioural simulation & synthesis |
+
+Teammates contributed further modules and testbenches — the commit history shows who did what.
+
+## Provided vs. implemented
+
+- **Provided by the chair (course templates):** the module *entities* (port declarations),
+  shared packages (`ArmTypes.vhd`, `ArmConfiguration.vhd`, `ArmFilePaths.vhd`), the test
+  helpers (`TB_Tools.vhd`) and most of the `*_tb.vhd` testbenches.
+- **Implemented by the team:** the architecture bodies of the modules listed above — the
+  actual logic — plus getting the uncore to simulate and synthesize.
+
+The provided template code remains the intellectual property of the TU Berlin chair and is
+included here only to keep the project self-contained.
+
+## Tech stack
+
+- **VHDL** (IEEE 1076)
+- **Xilinx Vivado** — synthesis, implementation, IP (Clocking Wizard)
+- **Simulation** — Vivado XSim / GHDL, driven via a `Makefile`
+- **Target hardware** — Basys 3 board, Artix-7 FPGA
+
+## Build & simulate
+
+```bash
+make            # see the Makefile for available simulation/build targets
+```
+Simulation and Vivado project artifacts are excluded via `.gitignore`.

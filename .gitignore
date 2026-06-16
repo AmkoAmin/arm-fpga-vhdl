@@ -33,3 +33,9 @@ build_rs232/
 .DS_Store
 *.swp
 *~
+
+# Generated synthesis/simulation artifacts
+*.vds
+*.rpt
+*.vcd
+*_sim_netlist.vhdl
